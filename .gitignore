@@ -1,0 +1,49 @@
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Matplotlib configuration
+.matplotlib/
+
+# Data files
+*.csv
+
+# Logs and debug files
+*.log
+*.out
+*.err
+*.pid
+
+# Python eggs
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Package manager lock files
+poetry.lock
+Pipfile.lock
+
+# System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+
+# Output files
+bird-plot.png
