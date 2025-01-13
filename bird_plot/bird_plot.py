@@ -89,7 +89,7 @@ def create_scatter_plot(df, filename):
     plt.text(-0.02, 0.5, "Confident, Assertive, Bold", transform=plt.gca().transAxes, rotation=90, va='center')  #Right Y-axis label
     plt.text(0.5, 1.01, "Warm & Friendly, People-oriented", transform=plt.gca().transAxes, ha='center') # Bottom X-axis label
     plt.text(1.01, 0.5, "Shy, Non-assertive, Retiring", transform=plt.gca().transAxes, rotation=270, va='center')  #Right Y-axis label
-    plt.text(0.5, -0.02, "Coll & Aloof, Task-oriented", transform=plt.gca().transAxes, ha='center') # Bottom X-axis label
+    plt.text(0.5, -0.02, "Cold & Aloof, Task-oriented", transform=plt.gca().transAxes, ha='center') # Bottom X-axis label
 
     # Add bird images to the corners, sticking to corners
     add_bird_image(ax, "birds/peacock.png", -25, 25, zoom=0.2) # Top-left corner
