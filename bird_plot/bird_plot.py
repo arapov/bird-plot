@@ -32,19 +32,34 @@ def create_square_radar_chart(data, filename):
 
     fig, ax = plt.subplots(figsize=(8, 8))
 
-    ax.plot(np.cos(angles) * values, np.sin(angles) * values, 'o-', linewidth=2)
-    ax.fill(np.cos(angles) * values, np.sin(angles) * values, alpha=0.25)
+    ax.plot(np.cos(angles) * values, np.sin(angles) * values, 'o', linewidth=2, markersize=2, color='black')
+    ax.fill(np.cos(angles) * values, np.sin(angles) * values )
 
-    max_value = 20
+    max_value = 25
     ax.set_aspect('equal', adjustable='box')
 
     # Add diagonal axes (black, full length, thinner)
-    ax.plot([-max_value, max_value], [-max_value, max_value], 'k-', linewidth=0.75)  # Diagonal 1
-    ax.plot([-max_value, max_value], [max_value, -max_value], 'k-', linewidth=0.75)  # Diagonal 2
+    ax.plot([-max_value, max_value], [-max_value, max_value], 'k-', linewidth=0.1)  # Diagonal 1
+    ax.plot([-max_value, max_value], [max_value, -max_value], 'k-', linewidth=0.1)  # Diagonal 2
 
     # Add horizontal and vertical lines
     ax.axhline(0, color='k', linestyle='-', linewidth=0.75)
     ax.axvline(0, color='k', linestyle='-', linewidth=0.75)
+
+    # Add colored quadrants
+    quadrant_rects = [
+        Rectangle((-29, 0), 29, 29, facecolor='lightgreen', alpha=0.2, edgecolor=None, zorder=-1), # Top-Right
+        Rectangle((-29, -29), 29, 29, facecolor='lightcoral', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Right
+        Rectangle((0, 0), 29, 29, facecolor='lightskyblue', alpha=0.2, edgecolor=None, zorder=-1), # Top-Left
+        Rectangle((0, -29), 29, 29, facecolor='khaki', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Left
+    ]
+    for rect in quadrant_rects:
+        ax.add_patch(rect)
+
+    # Add date
+    now = datetime.now()
+    date_string = now.strftime("%Y-%m-%d")
+    ax.text(1.05, -0.1, f"Generated: {date_string}", transform=ax.transAxes, ha='right')
 
     # Add labels to the dots
     offset = 0.1 * max(values)  # Adjust offset as needed
@@ -61,21 +76,18 @@ def create_square_radar_chart(data, filename):
         circle = plt.Circle((0, 0), i, fill=False, linestyle='--', alpha=0.3)
         ax.add_artist(circle)
 
-    # Add labels
-    for i, category in enumerate(categories):
-        x = np.cos(angles[i]) * max_value * 1.05
-        y = np.sin(angles[i]) * max_value * 1.05
-        ax.text(x, y, category, ha='center', va='center', rotation=angles[i] * 180 / np.pi + 45)
-
-    ax.set_title(f"Personality Square Chart - {data['Name']}")
+    ax.set_title(f"Personality Square Chart - {data['Name']} - {data['Note']}")
     ax.set_xticks([])
     ax.set_yticks([])
 
-    ax.set_xlim([-max_value * 1.2, max_value * 1.2])
-    ax.set_ylim([-max_value * 1.2, max_value * 1.2])
+    #ax.set_xlim([-max_value * 1.2, max_value * 1.2])
+    #ax.set_ylim([-max_value * 1.2, max_value * 1.2])
 
-    if 'Note' in data and data['Note']:
-        ax.text(0, 0, data['Note'], ha='center', va='center')
+    # Add bird images to the corners, sticking to corners
+    add_bird_image(ax, "birds/peacock.png", -27, 27, zoom=0.2) # Top-left corner
+    add_bird_image(ax, "birds/eagle.png", -27, -27, zoom=0.2)  # Bottom-left corner
+    add_bird_image(ax, "birds/dove.png", 27, 27, zoom=0.2)     # Top-right corner
+    add_bird_image(ax, "birds/owl.png", 27, -27, zoom=0.2)     # Bottom-right corner
 
     plt.savefig(filename, dpi=300)
     plt.close(fig)
