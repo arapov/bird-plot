@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -19,6 +20,77 @@ def add_bird_image(ax, img_path, x, y, zoom=0.2):
         ax.add_artist(ab)
     else:
         print(f"Warning: Image not found at {img_path}")
+
+def create_square_radar_chart(data, filename):
+    categories = ['Dove', 'Owl', 'Peacock', 'Eagle']
+    values = [data[cat] for cat in categories]
+    num_categories = len(categories)
+
+    angles = np.linspace(-np.pi / 4, 2 * np.pi - np.pi / 4, num_categories, endpoint=False)
+    values = values + values[:1]
+    angles = np.concatenate((angles, [angles[0]]))
+
+    fig, ax = plt.subplots(figsize=(8, 8))
+
+    ax.plot(np.cos(angles) * values, np.sin(angles) * values, 'o', linewidth=2, markersize=2, color='black')
+    ax.fill(np.cos(angles) * values, np.sin(angles) * values )
+
+    max_value = 25
+    ax.set_aspect('equal', adjustable='box')
+
+    # Add diagonal axes (black, full length, thinner)
+    ax.plot([-max_value, max_value], [-max_value, max_value], 'k-', linewidth=0.1)  # Diagonal 1
+    ax.plot([-max_value, max_value], [max_value, -max_value], 'k-', linewidth=0.1)  # Diagonal 2
+
+    # Add horizontal and vertical lines
+    ax.axhline(0, color='k', linestyle='-', linewidth=0.75)
+    ax.axvline(0, color='k', linestyle='-', linewidth=0.75)
+
+    # Add colored quadrants
+    quadrant_rects = [
+        Rectangle((-29, 0), 29, 29, facecolor='lightgreen', alpha=0.2, edgecolor=None, zorder=-1), # Top-Right
+        Rectangle((-29, -29), 29, 29, facecolor='lightcoral', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Right
+        Rectangle((0, 0), 29, 29, facecolor='lightskyblue', alpha=0.2, edgecolor=None, zorder=-1), # Top-Left
+        Rectangle((0, -29), 29, 29, facecolor='khaki', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Left
+    ]
+    for rect in quadrant_rects:
+        ax.add_patch(rect)
+
+    # Add date
+    now = datetime.now()
+    date_string = now.strftime("%Y-%m-%d")
+    ax.text(1.05, -0.1, f"Generated: {date_string}", transform=ax.transAxes, ha='right')
+
+    # Add labels to the dots
+    offset = 0.1 * max(values)  # Adjust offset as needed
+    for i, value in enumerate(values[:-1]):
+        x = np.cos(angles[i]) * value
+        y = np.sin(angles[i]) * value
+        # Calculate perpendicular offset
+        perp_x = -np.sin(angles[i]) * offset
+        perp_y = np.cos(angles[i]) * offset
+        ax.text(x + perp_x, y + perp_y, str(value), ha='center', va='center')
+
+    # Add radial gridlines
+    for i in range(0, max_value + 1, 5):
+        circle = plt.Circle((0, 0), i, fill=False, linestyle='--', alpha=0.3)
+        ax.add_artist(circle)
+
+    ax.set_title(f"Personality Square Chart - {data['Name']} - {data['Note']}")
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    #ax.set_xlim([-max_value * 1.2, max_value * 1.2])
+    #ax.set_ylim([-max_value * 1.2, max_value * 1.2])
+
+    # Add bird images to the corners, sticking to corners
+    add_bird_image(ax, "birds/peacock.png", -27, 27, zoom=0.2) # Top-left corner
+    add_bird_image(ax, "birds/eagle.png", -27, -27, zoom=0.2)  # Bottom-left corner
+    add_bird_image(ax, "birds/dove.png", 27, 27, zoom=0.2)     # Top-right corner
+    add_bird_image(ax, "birds/owl.png", 27, -27, zoom=0.2)     # Bottom-right corner
+
+    plt.savefig(filename, dpi=300)
+    plt.close(fig)
 
 def create_scatter_plot(df, filename):
     # Check if interactive plotting is enabled (command-line flag or environment variable)
@@ -137,7 +209,7 @@ def main():
         for index, row in df.iterrows():
             person_data = row.to_dict()
             output_filename = f"radar_chart_{person_data['Name']}.png"
-            #create_square_radar_chart(person_data, output_filename)
+            create_square_radar_chart(person_data, output_filename)
     elif graph_type == "scatter":
         output_filename = "scatter_chart_all.png"
         create_scatter_plot(df, output_filename)
