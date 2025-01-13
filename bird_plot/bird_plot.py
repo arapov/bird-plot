@@ -94,10 +94,14 @@ def main():
     ax.set_ylim(-25, 25)
     ax.set_xticks([])  # Remove x-axis ticks
     ax.set_yticks([])  # Remove y-axis ticks
-    plt.title("Personality Distribution (Bird Parameters)", fontsize=14)
-    plt.xlabel("Dove & Owl (+) vs Peacock & Eagle (-)")
-    plt.ylabel("Peacock & Dove (+) vs Eagle & Owl (-)")
     ax.set_aspect('equal', adjustable='box')
+
+    # Describe
+    plt.title("Personality Distribution (Bird Parameters)", fontsize=14, fontweight='bold', y=1.03)
+    plt.text(-0.02, 0.5, "Confident, Assertive, Bold", transform=plt.gca().transAxes, rotation=90, va='center')  #Right Y-axis label
+    plt.text(0.5, 1.01, "Warm & Friendly, People-oriented", transform=plt.gca().transAxes, ha='center') # Bottom X-axis label
+    plt.text(1.01, 0.5, "Shy, Non-assertive, Retiring", transform=plt.gca().transAxes, rotation=270, va='center')  #Right Y-axis label
+    plt.text(0.5, -0.02, "Coll & Aloof, Task-oriented", transform=plt.gca().transAxes, ha='center') # Bottom X-axis label
 
     # Add bird images to the corners, sticking to corners
     add_bird_image(ax, "birds/peacock.png", -25, 25, zoom=0.2) # Top-left corner
