@@ -46,6 +46,12 @@ def main():
     ax.axhline(0, color='gray', linewidth=0.5, linestyle='--')
     ax.axvline(0, color='gray', linewidth=0.5, linestyle='--')
 
+    # Add quadrant titles
+    ax.text(12.5, 24, "Supportive & Caring", fontsize=12, ha='center', va='center') # Top-Right
+    ax.text(-12.5, -24, "Controlling & Forceful", fontsize=12, ha='center', va='center') # Bottom-Right
+    ax.text(-12.5, 24, "Talkative & Dramatic", fontsize=12, ha='center', va='center') # Top-Left
+    ax.text(12.5, -24, "Analytical & Logical", fontsize=12, ha='center', va='center') # Bottom-Left
+
     # Add colored quadrants
     quadrant_rects = [
         Rectangle((-25, 0), 25, 25, facecolor='lightgreen', alpha=0.2, edgecolor=None, zorder=-1), # Top-Right
