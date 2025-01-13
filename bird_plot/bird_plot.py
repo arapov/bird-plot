@@ -92,6 +92,8 @@ def main():
     # Set fixed axis limits to ±25
     ax.set_xlim(-25, 25)
     ax.set_ylim(-25, 25)
+    ax.set_xticks([])  # Remove x-axis ticks
+    ax.set_yticks([])  # Remove y-axis ticks
     plt.title("Personality Distribution (Bird Parameters)", fontsize=14)
     plt.xlabel("Dove & Owl (+) vs Peacock & Eagle (-)")
     plt.ylabel("Peacock & Dove (+) vs Eagle & Owl (-)")
