@@ -5,6 +5,7 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import sys
 import os
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -61,6 +62,11 @@ def main():
     ]
     for rect in quadrant_rects:
         ax.add_patch(rect)
+
+    # Add date
+    now = datetime.now()
+    date_string = now.strftime("%Y-%m-%d")
+    ax.text(1.05, -0.1, f"Generated: {date_string}", transform=ax.transAxes, ha='right')
 
     # Add names in rounded boxes
     for i, row in df.iterrows():
