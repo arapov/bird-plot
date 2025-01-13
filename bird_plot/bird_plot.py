@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import FancyBboxPatch, Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import sys
 import os
@@ -46,29 +46,39 @@ def main():
     ax.axhline(0, color='gray', linewidth=0.5, linestyle='--')
     ax.axvline(0, color='gray', linewidth=0.5, linestyle='--')
 
-    # Add compact rounded boxes for each dot
+    # Add colored quadrants
+    quadrant_rects = [
+        Rectangle((-25, 0), 25, 25, facecolor='lightgreen', alpha=0.2, edgecolor=None, zorder=-1), # Top-Right
+        Rectangle((-25, -25), 25, 25, facecolor='lightcoral', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Right
+        Rectangle((0, 0), 25, 25, facecolor='lightskyblue', alpha=0.2, edgecolor=None, zorder=-1), # Top-Left
+        Rectangle((0, -25), 25, 25, facecolor='khaki', alpha=0.2, edgecolor=None, zorder=-1), # Bottom-Left
+    ]
+    for rect in quadrant_rects:
+        ax.add_patch(rect)
+
+    # Add names in rounded boxes
     for i, row in df.iterrows():
         # Combine name and note for text
         text = f"{row['Name']} {row['Note']}"
         text_length = len(text)
 
-        # Enhanced width calculation for better scaling
-        box_width = max(6, text_length * 0.25)  # Minimum width of 6; scales better with text length
+        # Scaling calculation
+        box_width = max(6, text_length * 0.25)  # Minimum width of 6; scales with text length
         box_height = 1  # Fixed compact height
 
         # Draw the rounded box
         box = FancyBboxPatch(
             (row["X"] - box_width / 2, row["Y"] - box_height / 2),  # Bottom-left corner of the box
             width=box_width,  # Width based on text length
-            height=box_height,  # Fixed height for compactness
-            boxstyle="round,pad=0.3",  # Rounded corners with slight padding
+            height=box_height,  # Fixed height
+            boxstyle="round,pad=0.3",  # Rounded corners
             edgecolor='lightblue',
             facecolor='lightblue',
             alpha=0.8
         )
         ax.add_patch(box)
 
-        # Add the text inside the box
+        # Add the text to the box
         ax.text(
             row["X"], row["Y"], text, fontsize=10, ha='center', va='center', color='black'
         )
@@ -81,22 +91,22 @@ def main():
     plt.ylabel("Peacock & Dove (+) vs Eagle & Owl (-)")
     ax.set_aspect('equal', adjustable='box')
 
-    # Add bird images to the corners, twice as big, sticking to corners
-    add_bird_image(ax, "birds/peacock.png", -25, 25, zoom=0.2)  # Top-left corner
+    # Add bird images to the corners, sticking to corners
+    add_bird_image(ax, "birds/peacock.png", -25, 25, zoom=0.2) # Top-left corner
     add_bird_image(ax, "birds/eagle.png", -25, -25, zoom=0.2)  # Bottom-left corner
-    add_bird_image(ax, "birds/dove.png", 25, 25, zoom=0.2)    # Top-right corner
-    add_bird_image(ax, "birds/owl.png", 25, -25, zoom=0.2)    # Bottom-right corner
+    add_bird_image(ax, "birds/dove.png", 25, 25, zoom=0.2)     # Top-right corner
+    add_bird_image(ax, "birds/owl.png", 25, -25, zoom=0.2)     # Bottom-right corner
 
-    # Save the plot to a file
-    output_path = os.getenv("OUTPUT_FILE_PATH", "output_plot.png")
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    print(f"Plot saved to {output_path}")
-
-    # Show legend, grid, and plot interactively if enabled
     if interactive_mode:
+        # Show legend, grid, and plot interactively
         plt.legend()
         plt.grid(alpha=0.3)
         plt.show()
+    else:
+        # Save the plot to a file
+        output_path = os.getenv("OUTPUT_FILE_PATH", "output_plot.png")
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
+        print(f"Plot saved to {output_path}")
 
 if __name__ == "__main__":
     main()
