@@ -4,6 +4,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import sys
 import os
+import argparse
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -19,28 +20,9 @@ def add_bird_image(ax, img_path, x, y, zoom=0.2):
     else:
         print(f"Warning: Image not found at {img_path}")
 
-def main():
-    # Read data from CSV (specified in .env or passed as a command-line argument)
-    if len(sys.argv) > 1:
-        file_path = sys.argv[1]
-    else:
-        file_path = os.getenv("CSV_FILE_PATH", "data.csv")
-
-    if not os.path.exists(file_path):
-        print(f"CSV file '{file_path}' not found!")
-        sys.exit(1)
-
+def create_scatter_plot(df, filename):
     # Check if interactive plotting is enabled (command-line flag or environment variable)
     interactive_mode = os.getenv("INTERACTIVE_PLOT", "false").lower() == "true"
-    if "--interactive" in sys.argv:
-        interactive_mode = True
-
-    # Load data
-    df = pd.read_csv(file_path)
-
-    # Calculate X and Y positions for the plot
-    df["X"] = (df["Dove"] + df["Owl"]) - (df["Peacock"] + df["Eagle"])
-    df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
 
     # Plot
     fig, ax = plt.subplots(figsize=(10, 10))
@@ -122,9 +104,47 @@ def main():
         plt.show()
     else:
         # Save the plot to a file
-        output_path = os.getenv("OUTPUT_FILE_PATH", "output_plot.png")
-        plt.savefig(output_path, dpi=300, bbox_inches="tight")
-        print(f"Plot saved to {output_path}")
+        plt.savefig(filename, dpi=300, bbox_inches="tight")
+        print(f"Plot saved to {filename}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate bird plot charts.")
+    parser.add_argument("--data", default="data.csv", help="Path to the CSV data file (default: data.csv).")
+    parser.add_argument("--graph-type", choices=["radar", "scatter"], default="scatter", help="Type of graph to generate (radar or scatter).")
+    args = parser.parse_args()
+
+    file_path = args.data
+    graph_type = args.graph_type
+
+    if not os.path.exists(file_path):
+        print(f"Error: CSV file '{file_path}' not found!")
+        sys.exit(1)
+
+    try:
+        df = pd.read_csv(file_path)
+    except pd.errors.EmptyDataError:
+        print(f"Error: CSV file '{file_path}' is empty.")
+        sys.exit(1)
+    except pd.errors.ParserError:
+        print(f"Error: Could not parse CSV file '{file_path}'. Check its format.")
+        sys.exit(1)
+
+    # Calculate X and Y coordinates for the biplot.
+    df["X"] = (df["Dove"] + df["Owl"]) - (df["Peacock"] + df["Eagle"])
+    df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
+
+    if graph_type == "radar":
+        for index, row in df.iterrows():
+            person_data = row.to_dict()
+            output_filename = f"radar_chart_{person_data['Name']}.png"
+            #create_square_radar_chart(person_data, output_filename)
+    elif graph_type == "scatter":
+        output_filename = "scatter_chart_all.png"
+        create_scatter_plot(df, output_filename)
+    else:
+        print(f"Error: Invalid graph type '{graph_type}'. Choose from 'radar' or 'scatter'.")
+        print("Use --help for more information.") # Suggest using --help if available.
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
