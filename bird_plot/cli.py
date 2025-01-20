@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
+from itertools import combinations
 
 import pandas as pd
 
@@ -40,6 +41,20 @@ def calculate_coordinates(df: pd.DataFrame) -> pd.DataFrame:
         print(f"Error: Missing required column in CSV: {e}")
         sys.exit(1)
 
+def generate_radar_charts(df: pd.DataFrame) -> None:
+    """Generate individual and comparison radar charts for all entries."""
+    # Generate individual radar charts
+    for _, row in df.iterrows():
+        person_data = row.to_dict()
+        output_filename = f"radar_chart_{person_data['Name']}.png"
+        radar_chart(person_data, Path(output_filename))
+
+    # Generate comparison radar charts for all possible pairs
+    for (idx1, row1), (idx2, row2) in combinations(df.iterrows(), 2):
+        person1_data = row1.to_dict()
+        person2_data = row2.to_dict()
+        output_filename = f"radar_chart_comparison_{person1_data['Name']}_{person2_data['Name']}.png"
+        radar_chart(person1_data, Path(output_filename), data2=person2_data)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate bird plot charts.")
@@ -65,10 +80,7 @@ def main() -> None:
     df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
 
     if args.graph_type == "radar":
-        for _, row in df.iterrows():
-            person_data = row.to_dict()
-            output_filename = f"radar_chart_{person_data['Name']}.png"
-            radar_chart(person_data, Path(output_filename))
+        generate_radar_charts(df)
     else:  # scatter
         output_filename = "scatter_chart_all.png"
         scatter_chart(df, Path(output_filename))

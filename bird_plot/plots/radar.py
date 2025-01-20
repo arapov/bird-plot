@@ -165,8 +165,77 @@ def plot(ax: Axes, angles: np.ndarray, values: np.ndarray) -> None:
     # This creates the filled shape of a radar plot
     ax.fill(x_coords, y_coords)
 
+def calculate_overlap(values1: np.ndarray, values2: np.ndarray, angles: np.ndarray) -> float:
+    """Calculate the percentage overlap between two radar plots.
 
-def radar_chart(data: Dict, filename: Path, config_path: Path = Path("config.toml")) -> None:
+    Args:
+        values1: Values for first radar plot
+        values2: Values for second radar plot
+        angles: Angles for both plots
+
+    Returns:
+        float: Percentage of overlap between the two plots (0-100)
+    """
+    # Convert to cartesian coordinates
+    x1 = np.cos(angles) * values1
+    y1 = np.sin(angles) * values1
+    x2 = np.cos(angles) * values2
+    y2 = np.sin(angles) * values2
+
+    # Create polygons
+    from matplotlib.path import Path
+    polygon1 = Path(np.column_stack((x1, y1)))
+    polygon2 = Path(np.column_stack((x2, y2)))
+
+    # Calculate areas using Monte Carlo method
+    points = 10000
+    bbox = [min(x1.min(), x2.min()), max(x1.max(), x2.max()),
+            min(y1.min(), y2.min()), max(y1.max(), y2.max())]
+
+    # Generate random points
+    rng = np.random.default_rng()
+    x = rng.uniform(bbox[0], bbox[1], points)
+    y = rng.uniform(bbox[2], bbox[3], points)
+    points = np.column_stack((x, y))
+
+    # Count points in each polygon
+    in_poly1 = polygon1.contains_points(points)
+    in_poly2 = polygon2.contains_points(points)
+
+    # Calculate overlap
+    intersection = np.sum(in_poly1 & in_poly2)
+    union = np.sum(in_poly1 | in_poly2)
+
+    return (intersection / union) * 100 if union > 0 else 0
+
+def plot_with_overlap(ax: Axes, angles: np.ndarray, values1: np.ndarray, values2: np.ndarray = None,
+                     color1: str = 'blue', color2: str = 'red', alpha: float = 0.3) -> None:
+    """Draw radar plot with optional overlap of two datasets.
+
+    Args:
+        ax: The matplotlib axes object
+        angles: Array of angles for the plots
+        values1: Values for first radar plot
+        values2: Optional values for second radar plot
+        color1: Color for first plot
+        color2: Color for second plot
+        alpha: Transparency level for fills
+    """
+    # Plot first dataset
+    x1 = np.cos(angles) * values1
+    y1 = np.sin(angles) * values1
+    ax.plot(x1, y1, 'x', markersize=5, color=color1)
+    ax.fill(x1, y1, color=color1, alpha=alpha)
+
+    # Plot second dataset if provided
+    if values2 is not None:
+        x2 = np.cos(angles) * values2
+        y2 = np.sin(angles) * values2
+        ax.plot(x2, y2, 'x', markersize=5, color=color2)
+        ax.fill(x2, y2, color=color2, alpha=alpha)
+
+def radar_chart(data1: Dict, filename: Path, data2: Dict = None,
+                config_path: Path = Path("config.toml")) -> None:
     """Create a radar chart for personality data.
 
     Args:
@@ -187,8 +256,8 @@ def radar_chart(data: Dict, filename: Path, config_path: Path = Path("config.tom
         # Starting at -π/2 and going clockwise:
         # Owl (bottom right) → Dove (top right) → Peacock (top left) → Eagle (bottom left)
         ordered_categories = ["Owl", "Dove", "Peacock", "Eagle"]
-        values = [data[cat] for cat in ordered_categories]
-        angles, values = calculate_angles(ordered_categories, values)
+        values1 = [data1[cat] for cat in ordered_categories]
+        angles, values1_array = calculate_angles(ordered_categories, values1)
 
         # Create and configure the matplotlib figure and axes
         fig, ax = setup_plot(config)
@@ -200,18 +269,43 @@ def radar_chart(data: Dict, filename: Path, config_path: Path = Path("config.tom
         add_bird_images(ax, config)  # Add bird images if configured
 
         # 2. Data visualization elements
-        plot(ax, angles, values)  # Draw the main radar plot
-        add_labels(ax, angles, values)  # Add value labels
+        #plot(ax, angles, values)  # Draw the main radar plot
+        #add_labels(ax, angles, values)  # Add value labels
+        if data2:
+            values2 = [data2[cat] for cat in ordered_categories]
+            _, values2_array = calculate_angles(ordered_categories, values2)
+
+            # Plot both datasets with different colors
+            plot_with_overlap(ax, angles, values1_array, values2_array)
+
+            # Calculate and display overlap percentage
+            overlap = calculate_overlap(values1_array, values2_array, angles)
+            ax.text(0, -config["chart"]["max_value"]-1,
+                   f"Overlap: {overlap:.1f}%",
+                   ha='center', va='center')
+
+            # Add legend
+            ax.plot([], [], color='blue', label=f"{data1['Name']}", alpha=0.3)
+            ax.plot([], [], color='red', label=f"{data2['Name']}", alpha=0.3)
+            ax.legend(loc='upper right')
+
+            title = f"Comparison: {data1['Name']} vs {data2['Name']}"
+        else:
+            # Single plot
+            plot_with_overlap(ax, angles, values1_array)
+            add_labels(ax, angles, values1_array)
+            title = f"{data1['Name']} {data1['Note']}"
+
 
         # 3. Metadata and title elements
         # Add current date to plot
         add_date(ax)
         # Set chart title using name and note from data
-        plt.title(
-            f"{data['Name']} {data['Note']}",
-            fontsize=14,
-            fontweight="bold",
-        )
+        #plt.title(
+        #    f"{data['Name']} {data['Note']}",
+        #    fontsize=14,
+        #    fontweight="bold",
+        #)
 
         # Save the chart to file
         plt.savefig(filename, dpi=300, bbox_inches="tight")
