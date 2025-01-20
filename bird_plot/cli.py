@@ -41,13 +41,29 @@ def calculate_coordinates(df: pd.DataFrame) -> pd.DataFrame:
         print(f"Error: Missing required column in CSV: {e}")
         sys.exit(1)
 
+def calculate_team_average(df: pd.DataFrame) -> dict:
+    """Calculate the team average scores."""
+    categories = ["Owl", "Dove", "Peacock", "Eagle"]
+    avg_scores = {cat: df[cat].mean() for cat in categories}
+    avg_scores['Name'] = 'Team Average'
+    avg_scores['Note'] = 'Team Average Profile'
+    return avg_scores
+
 def generate_radar_charts(df: pd.DataFrame) -> None:
     """Generate individual and comparison radar charts for all entries."""
+
+    # Calculate team average
+    team_avg = calculate_team_average(df)
+
     # Generate individual radar charts
     for _, row in df.iterrows():
         person_data = row.to_dict()
         output_filename = f"radar_chart_{person_data['Name']}.png"
         radar_chart(person_data, Path(output_filename))
+
+        # Individual vs Team Average comparison
+        output_filename = f"radar_chart_comparison_{person_data['Name']}_vs_TeamAvg.png"
+        radar_chart(person_data, Path(output_filename), data2=team_avg)
 
     # Generate comparison radar charts for all possible pairs
     for (idx1, row1), (idx2, row2) in combinations(df.iterrows(), 2):
