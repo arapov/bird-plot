@@ -85,7 +85,7 @@ def add_labels(
 
             # Add text label at the calculated position
             # Centered both horizontally and vertically
-            ax.text(x + perp_x, y + perp_y, str(value), ha="center", va="center")
+            ax.text(x + perp_x, y + perp_y, str(round(value)), ha="center", va="center")
 
 
 def add_grid(ax: Axes, config: Dict) -> None:

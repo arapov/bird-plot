@@ -49,6 +49,12 @@ def calculate_team_average(df: pd.DataFrame) -> dict:
     avg_scores['Note'] = 'Team Average Profile'
     return avg_scores
 
+def generate_team_average_radar(df: pd.DataFrame) -> None:
+    """Generate a single radar chart showing only the team average."""
+    team_avg = calculate_team_average(df)
+    output_filename = "radar_chart_team_average.png"
+    radar_chart(team_avg, Path(output_filename))
+
 def generate_radar_charts(df: pd.DataFrame) -> None:
     """Generate individual and comparison radar charts for all entries."""
 
@@ -97,6 +103,7 @@ def main() -> None:
 
     if args.graph_type == "radar":
         generate_radar_charts(df)
+        generate_team_average_radar(df)
     else:  # scatter
         output_filename = "scatter_chart_all.png"
         scatter_chart(df, Path(output_filename))
