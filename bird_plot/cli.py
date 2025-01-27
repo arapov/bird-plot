@@ -5,6 +5,7 @@ from pathlib import Path
 from itertools import combinations
 
 import pandas as pd
+import numpy as np
 
 from .plots.radar import radar_chart
 from .plots.scatter import scatter_chart
@@ -100,6 +101,12 @@ def main() -> None:
     # Calculate X and Y coordinates for the biplot.
     df["X"] = (df["Dove"] + df["Owl"]) - (df["Peacock"] + df["Eagle"])
     df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
+
+    def sigmoid_scale(series):
+        # Use tanh to smoothly compress values to [-1, 1], then scale to ±25
+        return 25 * np.tanh(series / series.abs().max())
+    df["X"] = sigmoid_scale(df["X"])
+    df["Y"] = sigmoid_scale(df["Y"])
 
     if args.graph_type == "radar":
         generate_radar_charts(df)
