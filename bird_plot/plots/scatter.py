@@ -54,7 +54,7 @@ def add_name_boxes(ax: Axes, df: pd.DataFrame) -> None:
     for _, row in df.iterrows():
         text = f"{row['Name']} {row['Note']}"
         text_length = len(text)
-        box_width = max(6, text_length * 0.25)
+        box_width = max(8, text_length * 0.4)
         box_height = 1
 
         box = FancyBboxPatch(
