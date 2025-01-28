@@ -1,11 +1,11 @@
 import argparse
 import os
 import sys
-from pathlib import Path
 from itertools import combinations
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from .plots.radar import radar_chart
 from .plots.scatter import scatter_chart
@@ -26,9 +26,7 @@ def load_csv_data(file_path):
         print(f"Error: CSV file '{file_path}' is empty.")
         sys.exit(1)
     except pd.errors.ParserError:
-        print(
-            f"Error: Could not parse CSV file '{file_path}'. Check its format."
-        )
+        print(f"Error: Could not parse CSV file '{file_path}'. Check its format.")
         sys.exit(1)
 
 
@@ -42,19 +40,22 @@ def calculate_coordinates(df: pd.DataFrame) -> pd.DataFrame:
         print(f"Error: Missing required column in CSV: {e}")
         sys.exit(1)
 
+
 def calculate_team_average(df: pd.DataFrame) -> dict:
     """Calculate the team average scores."""
     categories = ["Owl", "Dove", "Peacock", "Eagle"]
     avg_scores = {cat: df[cat].mean() for cat in categories}
-    avg_scores['Name'] = 'Team Average'
-    avg_scores['Note'] = 'Team Average Profile'
+    avg_scores["Name"] = "Team Average"
+    avg_scores["Note"] = "Team Average Profile"
     return avg_scores
+
 
 def generate_team_average_radar(df: pd.DataFrame) -> None:
     """Generate a single radar chart showing only the team average."""
     team_avg = calculate_team_average(df)
     output_filename = "radar_chart_team_average.png"
     radar_chart(team_avg, Path(output_filename))
+
 
 def generate_radar_charts(df: pd.DataFrame) -> None:
     """Generate individual and comparison radar charts for all entries."""
@@ -78,6 +79,7 @@ def generate_radar_charts(df: pd.DataFrame) -> None:
         person2_data = row2.to_dict()
         output_filename = f"radar_chart_comparison_{person1_data['Name']}_{person2_data['Name']}.png"
         radar_chart(person1_data, Path(output_filename), data2=person2_data)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate bird plot charts.")
@@ -105,6 +107,7 @@ def main() -> None:
     def sigmoid_scale(series):
         # Use tanh to smoothly compress values to [-1, 1], then scale to ±25
         return 25 * np.tanh(series / series.abs().max())
+
     df["X"] = sigmoid_scale(df["X"])
     df["Y"] = sigmoid_scale(df["Y"])
 
