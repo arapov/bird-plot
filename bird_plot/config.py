@@ -1,9 +1,11 @@
-import tomli
-from pathlib import Path
 import logging
+from pathlib import Path
 from typing import Dict
 
+import tomli
+
 logger = logging.getLogger(__name__)
+
 
 def load_config(config_path: Path = Path("config.toml")) -> Dict:
     """Load configuration from TOML file."""

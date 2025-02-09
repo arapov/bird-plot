@@ -12,6 +12,5 @@ top_left = "lightskyblue"
 bottom_left = "khaki"
 alpha = 0.2
 
-
 [paths]
 birds_dir = "birds"
