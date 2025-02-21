@@ -8,7 +8,7 @@ from matplotlib.axes import Axes
 from matplotlib.patches import Circle
 
 from ..config import load_config
-from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_titles, add_quadrants, setup_plot
+from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_labels, add_quadrants, setup_plot
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -276,7 +276,7 @@ def radar_chart(data1: Dict, filename: Path, data2: Dict = None, config_path: Pa
         add_grid(ax, config)  # Add grid lines
         add_quadrants(ax, config)  # Add quadrant labels/divisions
         add_bird_images(ax, config)  # Add bird images if configured
-        add_quadrant_titles(ax)  # Add quadrant titles
+        add_quadrant_labels(ax, config)  # Add quadrant labels
         add_axis_labels(ax)  # Add X and Y axis labels
 
         # 2. Data visualization elements

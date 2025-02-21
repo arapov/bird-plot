@@ -140,40 +140,31 @@ def add_quadrants(ax: Axes, config: Dict) -> None:
         ax.add_patch(rect)
 
 
-# TODO: make relative
-def add_quadrant_titles(ax: Axes) -> None:
-    """Add titles to the quadrants."""
-    titles = [
-        (12.5, 24, "Supportive & Caring"),  # Top-Right
-        (-12.5, -24, "Controlling & Forceful"),  # Bottom-Right
-        (-12.5, 24, "Talkative & Dramatic"),  # Top-Left
-        (12.5, -24, "Analytical & Logical"),  # Bottom-Left
+def add_quadrant_labels(ax: Axes, config: Dict) -> None:
+    """Add labels to the quadrants."""
+    max_value = config["chart"]["max_value"]
+    labels = [
+        (max_value / 2, max_value * 0.96, "Supportive & Caring"),  # Top-Right
+        (-max_value / 2, -max_value * 0.96, "Controlling & Forceful"),  # Bottom-Right
+        (-max_value / 2, max_value * 0.96, "Talkative & Dramatic"),  # Top-Left
+        (max_value / 2, -max_value * 0.96, "Analytical & Logical"),  # Bottom-Left
     ]
 
-    for x, y, text in titles:
-        ax.text(x, y, text, fontsize=12, ha="center", va="center")
+    for x, y, text in labels:
+        ax.text(x, y, text, ha="center", va="center")
 
 
-# TODO: make relative
 def add_axis_labels(ax: Axes) -> None:
     """Add descriptive labels to the axes."""
     labels = [
-        (-0.02, 0.5, "Confident, Assertive, Bold", 90),  # Left Y-axis
-        (0.5, 1.01, "Warm & Friendly, People-oriented", 0),  # Top X-axis
-        (1.01, 0.5, "Shy, Non-assertive, Retiring", 270),  # Right Y-axis
-        (0.5, -0.02, "Cold & Aloof, Task-oriented", 0),  # Bottom X-axis
+        (-0.015, 0.5, "Confident, Assertive, Bold", 90),  # Left Y-axis
+        (0.5, 1.015, "Warm & Friendly, People-oriented", 0),  # Top X-axis
+        (1.015, 0.5, "Shy, Non-assertive, Retiring", 270),  # Right Y-axis
+        (0.5, -0.015, "Cold & Aloof, Task-oriented", 0),  # Bottom X-axis
     ]
 
     for x, y, text, rotation in labels:
-        plt.text(
-            x,
-            y,
-            text,
-            transform=ax.transAxes,
-            rotation=rotation,
-            va="center",
-            ha="center",
-        )
+        plt.text(x, y, text, transform=ax.transAxes, rotation=rotation, va="center", ha="center", fontstyle="italic")
 
 
 def add_date(ax: Axes) -> None:
