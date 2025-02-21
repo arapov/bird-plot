@@ -81,7 +81,7 @@ def scatter_chart(df: pd.DataFrame, filename: Path, config: Dict) -> None:
 
         # Set chart title
         plt.title(
-            "Personality Distribution (Bird Parameters)",
+            "Personality Distribution",
             fontsize=14,
             fontweight="bold",
             y=1.03,
