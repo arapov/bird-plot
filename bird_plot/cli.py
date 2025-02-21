@@ -46,7 +46,7 @@ def generate_team_average_radar(df: pd.DataFrame, config: Dict) -> None:
     output_base = Path(config["paths"]["output"])
     output_base.mkdir(exist_ok=True)
     team_avg = calculate_team_average(df)
-    output_filename = output_base / "radar_chart_team_average.png"
+    output_filename = output_base / "radar_team_average.png"
     radar_chart(team_avg, Path(output_filename), config)
 
 
@@ -122,13 +122,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate bird plot charts.")
     parser.add_argument(
         "--data",
+        "-d",
         default=DEFAULT_DATA_FILE,
         help=f"Path to the CSV data file (default: {DEFAULT_DATA_FILE}).",
     )
     parser.add_argument(
-        "--graph-type",
+        "--graph",
+        "-g",
         choices=GRAPH_TYPES,
         default="scatter",
+        nargs="+",
         help="Type of graph to generate (radar or scatter).",
     )
     args = parser.parse_args()
@@ -136,14 +139,15 @@ def main() -> None:
     # Load and process data
     df = process_personality_data(args.data, config)
 
-    if args.graph_type == "radar":
+    # Handle multiple graph types
+    if "radar" in args.graph:
         generate_radar_charts(df, config)
         generate_team_average_radar(df, config)
-    else:  # scatter
+    if "scatter" in args.graph:
         # Get base output directory from config
         output_base = Path(config["paths"]["output"])
         output_base.mkdir(exist_ok=True)
-        output_filename = output_base / "scatter_chart_all.png"
+        output_filename = output_base / "scatter_all.png"
         scatter_chart(df, Path(output_filename), config)
 
 
