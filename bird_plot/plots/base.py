@@ -39,7 +39,7 @@ def setup_plot(config: dict) -> Tuple[Figure, Axes]:
     return fig, ax
 
 
-def add_bird_image(ax, img_path, x, y) -> None:
+def _add_bird_image(ax, img_path, x, y) -> None:
     """Add a bird image to the plot at specified coordinates.
 
     Args:
@@ -99,7 +99,7 @@ def add_bird_images(ax: Axes, config: Dict) -> None:
         # Construct full path to bird image file
         bird_path = birds_dir / f"{bird}.png"
         # Add the bird image to the plot
-        add_bird_image(ax, bird_path, x, y)
+        _add_bird_image(ax, bird_path, x, y)
 
 
 def add_quadrants(ax: Axes, config: Dict) -> None:
