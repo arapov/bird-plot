@@ -30,17 +30,6 @@ def load_csv_data(file_path):
         sys.exit(1)
 
 
-def calculate_coordinates(df: pd.DataFrame) -> pd.DataFrame:
-    """Calculate X and Y coordinates for the biplot."""
-    try:
-        df["X"] = (df["Dove"] + df["Owl"]) - (df["Peacock"] + df["Eagle"])
-        df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
-        return df
-    except KeyError as e:
-        print(f"Error: Missing required column in CSV: {e}")
-        sys.exit(1)
-
-
 def calculate_team_average(df: pd.DataFrame) -> dict:
     """Calculate the team average scores."""
     categories = ["Owl", "Dove", "Peacock", "Eagle"]
@@ -98,27 +87,18 @@ def main() -> None:
 
     # Load and process data
     df = load_csv_data(args.data)
-    df = calculate_coordinates(df)
 
     personality_cols = ["Dove", "Owl", "Peacock", "Eagle"]
-    df_adjusted = df[personality_cols].copy()
 
-    # For each row, find the maximum value and multiply all scores equal to that max by 1.12
-    for idx in df.index:
-        max_value = df.loc[idx, personality_cols].max()
-        # Find all columns that have the maximum value
-        dominant_cols = [col for col in personality_cols if df.loc[idx, col] == max_value]
-        # Multiply each maximum value
-        for col in dominant_cols:
-            df_adjusted.loc[idx, col] = int(df.loc[idx, col] * 1.2)
+    # Adjust scores - multiply max scores by 1.2
+    max_scores = df[personality_cols].max(axis=1)
+    df_adjusted = (
+        df[personality_cols].where(~df[personality_cols].eq(max_scores, axis=0), df[personality_cols] * 1.2).astype(int)
+    )
 
-    # Calculate X and Y coordinates for the plot using the adjusted values
+    # Calculate X and Y coordinates
     df["X"] = (df_adjusted["Dove"] + df_adjusted["Owl"]) - (df_adjusted["Peacock"] + df_adjusted["Eagle"])
     df["Y"] = (df_adjusted["Peacock"] + df_adjusted["Dove"]) - (df_adjusted["Eagle"] + df_adjusted["Owl"])
-
-    # Calculate X and Y coordinates for the biplot.
-    # df["X"] = (df["Dove"] + df["Owl"]) - (df["Peacock"] + df["Eagle"])
-    # df["Y"] = (df["Peacock"] + df["Dove"]) - (df["Eagle"] + df["Owl"])
 
     def sigmoid_scale(series):
         # Use tanh to smoothly compress values to [-1, 1], then scale to ±25
