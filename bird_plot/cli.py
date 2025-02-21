@@ -72,6 +72,33 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
         radar_chart(person1_data, Path(output_filename), config, data2=person2_data)
 
 
+def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
+    """Load and process personality data from CSV file."""
+    # Load data
+    df = load_csv_data(data_file)
+    personality_cols = ["Dove", "Owl", "Peacock", "Eagle"]
+
+    # Adjust scores - multiply max scores by 1.2
+    max_scores = df[personality_cols].max(axis=1)
+    df_adjusted = (
+        df[personality_cols].where(~df[personality_cols].eq(max_scores, axis=0), df[personality_cols] * 1.2).astype(int)
+    )
+
+    # Calculate X and Y coordinates
+    df["X"] = (df_adjusted["Dove"] + df_adjusted["Owl"]) - (df_adjusted["Peacock"] + df_adjusted["Eagle"])
+    df["Y"] = (df_adjusted["Peacock"] + df_adjusted["Dove"]) - (df_adjusted["Eagle"] + df_adjusted["Owl"])
+
+    # Scale coordinates
+    def sigmoid_scale(series):
+        # Use tanh to smoothly compress values to [-1, 1], then scale to ±max_value
+        return config["chart"]["max_value"] * np.tanh(series / series.abs().max())
+
+    df["X"] = sigmoid_scale(df["X"])
+    df["Y"] = sigmoid_scale(df["Y"])
+
+    return df
+
+
 def main() -> None:
     config = load_config()
 
@@ -90,26 +117,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # Load and process data
-    df = load_csv_data(args.data)
-
-    personality_cols = ["Dove", "Owl", "Peacock", "Eagle"]
-
-    # Adjust scores - multiply max scores by 1.2
-    max_scores = df[personality_cols].max(axis=1)
-    df_adjusted = (
-        df[personality_cols].where(~df[personality_cols].eq(max_scores, axis=0), df[personality_cols] * 1.2).astype(int)
-    )
-
-    # Calculate X and Y coordinates
-    df["X"] = (df_adjusted["Dove"] + df_adjusted["Owl"]) - (df_adjusted["Peacock"] + df_adjusted["Eagle"])
-    df["Y"] = (df_adjusted["Peacock"] + df_adjusted["Dove"]) - (df_adjusted["Eagle"] + df_adjusted["Owl"])
-
-    def sigmoid_scale(series):
-        # Use tanh to smoothly compress values to [-1, 1], then scale to ±25
-        return config["chart"]["max_value"] * np.tanh(series / series.abs().max())
-
-    df["X"] = sigmoid_scale(df["X"])
-    df["Y"] = sigmoid_scale(df["Y"])
+    df = process_personality_data(args.data, config)
 
     if args.graph_type == "radar":
         generate_radar_charts(df, config)
