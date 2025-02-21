@@ -291,12 +291,19 @@ def radar_chart(data1: Dict, filename: Path, data2: Dict = None, config_path: Pa
 
             # Calculate and display overlap percentage
             overlap = calculate_overlap(values1_array, values2_array, angles)
-            ax.text(0, -config["chart"]["max_value"] - 1, f"Overlap: {overlap:.1f}%", ha="center", va="center")
+            ax.text(0, -config["chart"]["max_value"] - 3, f"Overlap: {overlap:.1f}%", ha="center", va="center")
 
             # Add legend
             ax.plot([], [], color="blue", label=f"{data1['Name']}", alpha=0.3)
             ax.plot([], [], color="red", label=f"{data2['Name']}", alpha=0.3)
-            ax.legend(loc="upper right")
+            ax.legend(
+                title="Legend",
+                loc="upper center",
+                edgecolor="black",
+                framealpha=1.0,
+                fancybox=False,
+                bbox_to_anchor=(1, 0.9),
+            )
 
             title = f"Comparison: {data1['Name']} vs {data2['Name']}"
         else:
