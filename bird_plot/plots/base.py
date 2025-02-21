@@ -140,6 +140,42 @@ def add_quadrants(ax: Axes, config: Dict) -> None:
         ax.add_patch(rect)
 
 
+# TODO: make relative
+def add_quadrant_titles(ax: Axes) -> None:
+    """Add titles to the quadrants."""
+    titles = [
+        (12.5, 24, "Supportive & Caring"),  # Top-Right
+        (-12.5, -24, "Controlling & Forceful"),  # Bottom-Right
+        (-12.5, 24, "Talkative & Dramatic"),  # Top-Left
+        (12.5, -24, "Analytical & Logical"),  # Bottom-Left
+    ]
+
+    for x, y, text in titles:
+        ax.text(x, y, text, fontsize=12, ha="center", va="center")
+
+
+# TODO: make relative
+def add_axis_labels(ax: Axes) -> None:
+    """Add descriptive labels to the axes."""
+    labels = [
+        (-0.02, 0.5, "Confident, Assertive, Bold", 90),  # Left Y-axis
+        (0.5, 1.01, "Warm & Friendly, People-oriented", 0),  # Top X-axis
+        (1.01, 0.5, "Shy, Non-assertive, Retiring", 270),  # Right Y-axis
+        (0.5, -0.02, "Cold & Aloof, Task-oriented", 0),  # Bottom X-axis
+    ]
+
+    for x, y, text, rotation in labels:
+        plt.text(
+            x,
+            y,
+            text,
+            transform=ax.transAxes,
+            rotation=rotation,
+            va="center",
+            ha="center",
+        )
+
+
 def add_date(ax: Axes) -> None:
     """Add generation date to the plot.
 
