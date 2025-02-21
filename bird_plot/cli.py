@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-from itertools import combinations
 from pathlib import Path
 from typing import Dict
 
@@ -43,13 +42,20 @@ def calculate_team_average(df: pd.DataFrame) -> dict:
 
 def generate_team_average_radar(df: pd.DataFrame, config: Dict) -> None:
     """Generate a single radar chart showing only the team average."""
+    # Get base output directory from config
+    output_base = Path(config["paths"]["output"])
+    output_base.mkdir(exist_ok=True)
     team_avg = calculate_team_average(df)
-    output_filename = "radar_chart_team_average.png"
+    output_filename = output_base / "radar_chart_team_average.png"
     radar_chart(team_avg, Path(output_filename), config)
 
 
 def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     """Generate individual and comparison radar charts for all entries."""
+
+    # Get base output directory from config
+    output_base = Path(config["paths"]["output"])
+    output_base.mkdir(exist_ok=True)
 
     # Calculate team average
     team_avg = calculate_team_average(df)
@@ -57,19 +63,30 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     # Generate individual radar charts
     for _, row in df.iterrows():
         person_data = row.to_dict()
-        output_filename = f"radar_chart_{person_data['Name']}.png"
-        radar_chart(person_data, Path(output_filename), config)
+        person_name = person_data["Name"]
+
+        # Create person's directory if it doesn't exist
+        person_dir = output_base / person_name
+        person_dir.mkdir(exist_ok=True)
+
+        # Create comparison subdirectory
+        compare_dir = person_dir / "compare"
+        compare_dir.mkdir(exist_ok=True)
+
+        # Individual radar chart
+        output_filename = person_dir / f"radar_{person_name}.png"
+        radar_chart(person_data, output_filename, config)
 
         # Individual vs Team Average comparison
-        output_filename = f"radar_chart_comparison_{person_data['Name']}_vs_TeamAvg.png"
-        radar_chart(person_data, Path(output_filename), config, data2=team_avg)
+        output_filename = compare_dir / "with_TeamAvg.png"
+        radar_chart(person_data, output_filename, config, data2=team_avg)
 
-    # Generate comparison radar charts for all possible pairs
-    for (idx1, row1), (idx2, row2) in combinations(df.iterrows(), 2):
-        person1_data = row1.to_dict()
-        person2_data = row2.to_dict()
-        output_filename = f"radar_chart_comparison_{person1_data['Name']}_{person2_data['Name']}.png"
-        radar_chart(person1_data, Path(output_filename), config, data2=person2_data)
+        # Generate comparisons with all other people
+        for _, other_row in df.iterrows():
+            if other_row["Name"] != person_name:
+                other_data = other_row.to_dict()
+                output_filename = compare_dir / f"with_{other_data['Name']}.png"
+                radar_chart(person_data, output_filename, config, data2=other_data)
 
 
 def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
@@ -123,7 +140,10 @@ def main() -> None:
         generate_radar_charts(df, config)
         generate_team_average_radar(df, config)
     else:  # scatter
-        output_filename = "scatter_chart_all.png"
+        # Get base output directory from config
+        output_base = Path(config["paths"]["output"])
+        output_base.mkdir(exist_ok=True)
+        output_filename = output_base / "scatter_chart_all.png"
         scatter_chart(df, Path(output_filename), config)
 
 

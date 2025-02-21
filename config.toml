@@ -14,3 +14,4 @@ alpha = 0.2
 
 [paths]
 birds_dir = "birds"
+output = "charts"
