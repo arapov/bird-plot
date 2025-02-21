@@ -7,7 +7,6 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.patches import Circle
 
-from ..config import load_config
 from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_labels, add_quadrants, setup_plot
 
 logger = logging.getLogger(__name__)
@@ -244,7 +243,7 @@ def plot_with_overlap(
         ax.fill(x2, y2, color=color2, alpha=alpha)
 
 
-def radar_chart(data1: Dict, filename: Path, data2: Dict = None, config_path: Path = Path("config.toml")) -> None:
+def radar_chart(data1: Dict, filename: Path, config: Dict, data2: Dict = None) -> None:
     """Create a radar chart for personality data.
 
     Args:
@@ -258,9 +257,6 @@ def radar_chart(data1: Dict, filename: Path, data2: Dict = None, config_path: Pa
     """
     fig = None
     try:
-        # Load configuration settings from TOML file
-        config = load_config(config_path)
-
         # The order is critical for angle calculations:
         # Starting at -π/2 and going clockwise:
         # Owl (bottom right) → Dove (top right) → Peacock (top left) → Eagle (bottom left)

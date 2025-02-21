@@ -1,12 +1,12 @@
 import logging
 from pathlib import Path
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.patches import FancyBboxPatch
 
-from ..config import load_config
 from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_labels, add_quadrants, setup_plot
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ def add_grid(ax: Axes) -> None:
     ax.axvline(0, color="gray", linewidth=0.5, linestyle="--")
 
 
-def scatter_chart(df: pd.DataFrame, filename: Path, config_path: Path = Path("config.toml")) -> None:
+def scatter_chart(df: pd.DataFrame, filename: Path, config: Dict) -> None:
     """Create a scatter plot of personality distributions.
 
     Args:
@@ -61,9 +61,6 @@ def scatter_chart(df: pd.DataFrame, filename: Path, config_path: Path = Path("co
     """
     fig = None
     try:
-        # Load configuration settings from TOML file
-        config = load_config(config_path)
-
         # Create and configure the matplotlib figure and axes
         fig, ax = setup_plot(config)
 

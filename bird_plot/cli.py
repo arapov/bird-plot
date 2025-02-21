@@ -3,10 +3,12 @@ import os
 import sys
 from itertools import combinations
 from pathlib import Path
+from typing import Dict
 
 import numpy as np
 import pandas as pd
 
+from .config import load_config
 from .plots.radar import radar_chart
 from .plots.scatter import scatter_chart
 
@@ -39,14 +41,14 @@ def calculate_team_average(df: pd.DataFrame) -> dict:
     return avg_scores
 
 
-def generate_team_average_radar(df: pd.DataFrame) -> None:
+def generate_team_average_radar(df: pd.DataFrame, config: Dict) -> None:
     """Generate a single radar chart showing only the team average."""
     team_avg = calculate_team_average(df)
     output_filename = "radar_chart_team_average.png"
-    radar_chart(team_avg, Path(output_filename))
+    radar_chart(team_avg, Path(output_filename), config)
 
 
-def generate_radar_charts(df: pd.DataFrame) -> None:
+def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     """Generate individual and comparison radar charts for all entries."""
 
     # Calculate team average
@@ -56,21 +58,23 @@ def generate_radar_charts(df: pd.DataFrame) -> None:
     for _, row in df.iterrows():
         person_data = row.to_dict()
         output_filename = f"radar_chart_{person_data['Name']}.png"
-        radar_chart(person_data, Path(output_filename))
+        radar_chart(person_data, Path(output_filename), config)
 
         # Individual vs Team Average comparison
         output_filename = f"radar_chart_comparison_{person_data['Name']}_vs_TeamAvg.png"
-        radar_chart(person_data, Path(output_filename), data2=team_avg)
+        radar_chart(person_data, Path(output_filename), config, data2=team_avg)
 
     # Generate comparison radar charts for all possible pairs
     for (idx1, row1), (idx2, row2) in combinations(df.iterrows(), 2):
         person1_data = row1.to_dict()
         person2_data = row2.to_dict()
         output_filename = f"radar_chart_comparison_{person1_data['Name']}_{person2_data['Name']}.png"
-        radar_chart(person1_data, Path(output_filename), data2=person2_data)
+        radar_chart(person1_data, Path(output_filename), config, data2=person2_data)
 
 
 def main() -> None:
+    config = load_config()
+
     parser = argparse.ArgumentParser(description="Generate bird plot charts.")
     parser.add_argument(
         "--data",
@@ -102,17 +106,17 @@ def main() -> None:
 
     def sigmoid_scale(series):
         # Use tanh to smoothly compress values to [-1, 1], then scale to ±25
-        return 25 * np.tanh(series / series.abs().max())
+        return config["chart"]["max_value"] * np.tanh(series / series.abs().max())
 
     df["X"] = sigmoid_scale(df["X"])
     df["Y"] = sigmoid_scale(df["Y"])
 
     if args.graph_type == "radar":
-        generate_radar_charts(df)
-        generate_team_average_radar(df)
+        generate_radar_charts(df, config)
+        generate_team_average_radar(df, config)
     else:  # scatter
         output_filename = "scatter_chart_all.png"
-        scatter_chart(df, Path(output_filename))
+        scatter_chart(df, Path(output_filename), config)
 
 
 if __name__ == "__main__":
