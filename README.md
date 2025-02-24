@@ -112,21 +112,21 @@ _Note: Run `poetry run bird-plot --help` for detailed usage._
 - Plots one person’s scores around four axes (Eagle, Dove, Owl, Peacock).
 - The polygon edges connect each axis’s numeric value, visually representing personality strengths.
 
-<img src="https://github.com/arapov/bird-plot/blob/master/charts/Grace/radar_Grace.png" width="555">
+<img src="https://media.githubusercontent.com/media/arapov/bird-plot/refs/heads/master/charts/Grace/radar_Grace.png" width="555">
 
 2. **Group/Team Distribution - Scatter Plot**
 
 - Displays multiple names on a quadrant chart.
 - Each quadrant corresponds to a “bird” style, with positions indicating how strongly each person aligns to one or more dimensions.
 
-<img src="https://github.com/arapov/bird-plot/blob/master/charts/scatter_all.png" width="555">
+<img src="https://media.githubusercontent.com/media/arapov/bird-plot/refs/heads/master/charts/scatter_all.png" width="555">
 
 3. **Comparison/Overlap Plot**
 
 - Overlays two radar plots for a side-by-side comparison.
 - Shows an “Overlap” percentage as a measure of similarity.
 
-<img src="https://github.com/arapov/bird-plot/blob/master/charts/Grace/compare/with_Henry.png" width="555">
+<img src="https://media.githubusercontent.com/media/arapov/bird-plot/refs/heads/master/charts/Grace/compare/with_Henry.png" width="555">
 
 _(Note: The above images are illustrative examples.)_
 
