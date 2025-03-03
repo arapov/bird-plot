@@ -35,8 +35,8 @@ def calculate_team_average(df: pd.DataFrame) -> dict:
     """Calculate the team average scores."""
     categories = ["Owl", "Dove", "Peacock", "Eagle"]
     avg_scores = {cat: df[cat].mean() for cat in categories}
-    avg_scores["Name"] = "Team Average"
-    avg_scores["Note"] = "Team Average Profile"
+    avg_scores["Name"] = "Team Average Profile"
+    avg_scores["Note"] = ""  # TODO: Use when the dominants are calculated
     return avg_scores
 
 
@@ -78,7 +78,7 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
         radar_chart(person_data, output_filename, config)
 
         # Individual vs Team Average comparison
-        output_filename = compare_dir / "with_TeamAvg.png"
+        output_filename = compare_dir / "with_TeamAverage.png"
         radar_chart(person_data, output_filename, config, data2=team_avg)
 
         # Generate comparisons with all other people

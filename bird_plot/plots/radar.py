@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.patches import Circle
 
@@ -306,7 +307,7 @@ def radar_chart(data1: Dict, filename: Path, config: Dict, data2: Dict = None) -
             # Single plot
             plot_with_overlap(ax, angles, values1_array)
             add_labels(ax, angles, values1_array)
-            title = f"{data1['Name']} {data1['Note']}"
+            title = f"{data1['Name']}{', ' + data1['Note'] if data1['Note'] and not pd.isna(data1['Note']) else ''}"
 
         # 3. Metadata and title elements
         # Add current date to plot
