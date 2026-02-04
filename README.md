@@ -18,7 +18,8 @@ These plots are especially useful for workshops, coaching sessions, and team-bui
 2. [Installation](#installation)
 3. [Usage](#usage)
 4. [Input Data Format](#input-data-format)
-5. [Example Outputs](#example-outputs)
+5. [Testing](#testing)
+6. [Example Outputs](#example-outputs)
 
 ---
 
@@ -104,6 +105,14 @@ _Note: Run `poetry run bird-plot --help` for detailed usage._
 - **Name**: The individual’s name or identifier.
 - **Dove, Eagle, Owl, Peacock**: Numeric scores representing each “bird” trait.
 - **Note**: Individual's primary and secondary dominant "bird" traits, separated by a forward slash.
+
+## Testing
+
+Run the test suite with:
+
+```bash
+poetry run pytest
+```
 
 ## Example Outputs
 

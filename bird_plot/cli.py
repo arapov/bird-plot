@@ -58,6 +58,14 @@ def _safe_name_for_path(name: str) -> str:
     return safe or "unnamed"
 
 
+def _sigmoid_scale(series: pd.Series, max_value: float) -> pd.Series:
+    """Scale series with tanh compression, guarding against divide-by-zero."""
+    denom = series.abs().max()
+    if denom == 0 or pd.isna(denom):
+        return series * 0
+    return max_value * np.tanh(series / denom)
+
+
 def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     """Generate individual and comparison radar charts for all entries."""
 
@@ -117,15 +125,9 @@ def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
     df["Y"] = (df_adjusted["Peacock"] + df_adjusted["Dove"]) - (df_adjusted["Eagle"] + df_adjusted["Owl"])
 
     # Scale coordinates
-    def sigmoid_scale(series):
-        # Use tanh to smoothly compress values to [-1, 1], then scale to ±max_value
-        denom = series.abs().max()
-        if denom == 0 or pd.isna(denom):
-            return series * 0
-        return config["chart"]["max_value"] * np.tanh(series / denom)
-
-    df["X"] = sigmoid_scale(df["X"])
-    df["Y"] = sigmoid_scale(df["Y"])
+    # Use tanh to smoothly compress values to [-1, 1], then scale to ±max_value
+    df["X"] = _sigmoid_scale(df["X"], config["chart"]["max_value"])
+    df["Y"] = _sigmoid_scale(df["Y"], config["chart"]["max_value"])
 
     return df
 

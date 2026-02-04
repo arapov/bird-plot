@@ -244,6 +244,14 @@ def plot_with_overlap(
         ax.fill(x2, y2, color=color2, alpha=alpha)
 
 
+def _format_title(data: Dict) -> str:
+    """Format radar chart title with optional note."""
+    note = data.get("Note")
+    if note and not pd.isna(note):
+        return f"{data['Name']}, {note}"
+    return f"{data['Name']}"
+
+
 def radar_chart(data1: Dict, filename: Path, config: Dict, data2: Dict = None) -> None:
     """Create a radar chart for personality data.
 
@@ -307,11 +315,11 @@ def radar_chart(data1: Dict, filename: Path, config: Dict, data2: Dict = None) -
             # Single plot
             plot_with_overlap(ax, angles, values1_array)
             add_labels(ax, angles, values1_array)
-            title = f"{data1['Name']}{', ' + data1['Note'] if data1['Note'] and not pd.isna(data1['Note']) else ''}"
+            title = _format_title(data1)
 
         # 3. Metadata and title elements
         # Add current date to plot
-        add_date(ax)
+        add_date(ax, config)
         # Set chart title using name and note from data
         plt.title(
             f"{title}",

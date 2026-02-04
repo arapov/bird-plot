@@ -167,19 +167,36 @@ def add_axis_labels(ax: Axes) -> None:
         plt.text(x, y, text, transform=ax.transAxes, rotation=rotation, va="center", ha="center", fontstyle="italic")
 
 
-def add_date(ax: Axes) -> None:
-    """Add generation date to the plot.
+def add_date(ax: Axes, config: Dict) -> None:
+    """Add generation date and project link to the plot.
 
     Args:
         ax: The matplotlib axes object to draw on
+        config: Dictionary containing configuration including:
+            - 'chart.show_project_link': whether to show project link
     """
     # Format current date as YYYY-MM-DD
     date_string = datetime.now().strftime("%Y-%m-%d")
+    y_pos = -0.1
+    link_fontsize = 5
+    date_fontsize = 10
+    if config.get("chart", {}).get("show_project_link", True):
+        # Add project link centered under the plot
+        ax.text(
+            0.5,
+            y_pos,
+            "https://github.com/arapov/bird-plot",
+            transform=ax.transAxes,
+            ha="center",
+            fontsize=link_fontsize,
+            color="black",
+        )
     # Add date text to the plot
     ax.text(
         1,  # X position: right edge
-        -0.1,  # Y position: 10% below bottom of axes
+        y_pos,  # Y position: 10% below bottom of axes
         f"Generated: {date_string}",
         transform=ax.transAxes,  # Use axes coordinates (0-1 range)
         ha="right",
+        fontsize=date_fontsize,
     )
