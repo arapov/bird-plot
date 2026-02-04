@@ -50,6 +50,14 @@ def generate_team_average_radar(df: pd.DataFrame, config: Dict) -> None:
     radar_chart(team_avg, Path(output_filename), config)
 
 
+def _safe_name_for_path(name: str) -> str:
+    """Normalize a display name into a safe filesystem path segment."""
+    # Keep alphanumerics, dot, dash, underscore; collapse others to "_".
+    safe = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in str(name))
+    safe = safe.strip("._-")
+    return safe or "unnamed"
+
+
 def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     """Generate individual and comparison radar charts for all entries."""
 
@@ -64,9 +72,10 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
     for _, row in df.iterrows():
         person_data = row.to_dict()
         person_name = person_data["Name"]
+        person_slug = _safe_name_for_path(person_name)
 
         # Create person's directory if it doesn't exist
-        person_dir = output_base / person_name
+        person_dir = output_base / person_slug
         person_dir.mkdir(exist_ok=True)
 
         # Create comparison subdirectory
@@ -74,7 +83,7 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
         compare_dir.mkdir(exist_ok=True)
 
         # Individual radar chart
-        output_filename = person_dir / f"radar_{person_name}.png"
+        output_filename = person_dir / f"radar_{person_slug}.png"
         radar_chart(person_data, output_filename, config)
 
         # Individual vs Team Average comparison
@@ -85,8 +94,10 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
         for _, other_row in df.iterrows():
             if other_row["Name"] != person_name:
                 other_data = other_row.to_dict()
-                output_filename = compare_dir / f"with_{other_data['Name']}.png"
-                radar_chart(person_data, output_filename, config, data2=other_data)
+        other_name = other_data["Name"]
+        other_slug = _safe_name_for_path(other_name)
+        output_filename = compare_dir / f"with_{other_slug}.png"
+        radar_chart(person_data, output_filename, config, data2=other_data)
 
 
 def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
@@ -108,7 +119,10 @@ def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
     # Scale coordinates
     def sigmoid_scale(series):
         # Use tanh to smoothly compress values to [-1, 1], then scale to ±max_value
-        return config["chart"]["max_value"] * np.tanh(series / series.abs().max())
+        denom = series.abs().max()
+        if denom == 0 or pd.isna(denom):
+            return series * 0
+        return config["chart"]["max_value"] * np.tanh(series / denom)
 
     df["X"] = sigmoid_scale(df["X"])
     df["Y"] = sigmoid_scale(df["Y"])
