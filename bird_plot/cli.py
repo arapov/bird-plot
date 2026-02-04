@@ -94,10 +94,10 @@ def generate_radar_charts(df: pd.DataFrame, config: Dict) -> None:
         for _, other_row in df.iterrows():
             if other_row["Name"] != person_name:
                 other_data = other_row.to_dict()
-        other_name = other_data["Name"]
-        other_slug = _safe_name_for_path(other_name)
-        output_filename = compare_dir / f"with_{other_slug}.png"
-        radar_chart(person_data, output_filename, config, data2=other_data)
+                other_name = other_data["Name"]
+                other_slug = _safe_name_for_path(other_name)
+                output_filename = compare_dir / f"with_{other_slug}.png"
+                radar_chart(person_data, output_filename, config, data2=other_data)
 
 
 def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
