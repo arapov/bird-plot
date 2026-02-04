@@ -119,10 +119,10 @@ def add_quadrants(ax: Axes, config: Dict) -> None:
     # Define quadrants with their positions and colors
     # Each quadrant is defined by its bottom-left corner (x,y) and color
     quadrants = [
-        ((-max_value, 0), config["colors"]["top_right"]),
-        ((-max_value, -max_value), config["colors"]["bottom_right"]),
-        ((0, 0), config["colors"]["top_left"]),
-        ((0, -max_value), config["colors"]["bottom_left"]),
+        ((-max_value, 0), config["colors"]["top_left"]),
+        ((-max_value, -max_value), config["colors"]["bottom_left"]),
+        ((0, 0), config["colors"]["top_right"]),
+        ((0, -max_value), config["colors"]["bottom_right"]),
     ]
 
     # Create and add each quadrant rectangle to the plot

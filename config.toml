@@ -6,10 +6,10 @@ grid_step = 5
 
 [colors]
 # quadrants
-top_right = "lightgreen"
-bottom_right = "lightcoral"
-top_left = "lightskyblue"
-bottom_left = "khaki"
+top_right = "lightskyblue"
+bottom_right = "khaki"
+top_left = "lightgreen"
+bottom_left = "lightcoral"
 alpha = 0.2
 
 [paths]
