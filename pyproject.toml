@@ -1,6 +1,6 @@
 [project]
 name = "bird-plot"
-version = "0.1.0"
+version = "0.1.1"
 description = "A script to plot bird personality distribution"
 authors = [{ name = "Anton Arapov" }]
 license = { text = "Apache License 2.0" }
