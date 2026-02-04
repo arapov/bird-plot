@@ -319,7 +319,7 @@ def radar_chart(data1: Dict, filename: Path, config: Dict, data2: Dict = None) -
 
         # 3. Metadata and title elements
         # Add current date to plot
-        add_date(ax)
+        add_date(ax, config)
         # Set chart title using name and note from data
         plt.title(
             f"{title}",

@@ -77,7 +77,7 @@ def scatter_chart(df: pd.DataFrame, filename: Path, config: Dict) -> None:
 
         # 3. Metadata and title elements
         # Add current date to plot
-        add_date(ax)
+        add_date(ax, config)
 
         # Set chart title
         plt.title(
