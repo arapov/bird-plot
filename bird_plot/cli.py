@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import sys
 from pathlib import Path
@@ -11,8 +12,11 @@ from .config import load_config
 from .plots.radar import radar_chart
 from .plots.scatter import scatter_chart
 
+logger = logging.getLogger(__name__)
+
 GRAPH_TYPES = ["radar", "scatter"]
 DEFAULT_DATA_FILE = "data.csv"
+REQUIRED_COLUMNS = {"Name", "Dove", "Owl", "Peacock", "Eagle"}
 
 
 def load_csv_data(file_path):
@@ -22,7 +26,7 @@ def load_csv_data(file_path):
         sys.exit(1)
 
     try:
-        return pd.read_csv(file_path)
+        df = pd.read_csv(file_path)
     except pd.errors.EmptyDataError:
         print(f"Error: CSV file '{file_path}' is empty.")
         sys.exit(1)
@@ -30,13 +34,27 @@ def load_csv_data(file_path):
         print(f"Error: Could not parse CSV file '{file_path}'. Check its format.")
         sys.exit(1)
 
+    missing = REQUIRED_COLUMNS - set(df.columns)
+    if missing:
+        print(f"Error: CSV file '{file_path}' is missing required columns: {', '.join(sorted(missing))}")
+        sys.exit(1)
+
+    negative = {col: True for col in REQUIRED_COLUMNS - {"Name"} if (df[col] < 0).any()}
+    if negative:
+        print(f"Error: Negative scores found in columns: {', '.join(sorted(negative))}")
+        sys.exit(1)
+
+    return df
+
 
 def calculate_team_average(df: pd.DataFrame) -> dict:
     """Calculate the team average scores."""
     categories = ["Owl", "Dove", "Peacock", "Eagle"]
     avg_scores = {cat: df[cat].mean() for cat in categories}
     avg_scores["Name"] = "Team Average Profile"
-    avg_scores["Note"] = ""  # TODO: Use when the dominants are calculated
+    # Show the top two dominant birds (by average score), abbreviated to first letter
+    sorted_cats = sorted(categories, key=lambda c: avg_scores[c], reverse=True)
+    avg_scores["Note"] = "/".join(c[0] for c in sorted_cats[:2])
     return avg_scores
 
 
@@ -133,6 +151,7 @@ def process_personality_data(data_file: str, config: Dict) -> pd.DataFrame:
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO)
     config = load_config()
 
     parser = argparse.ArgumentParser(description="Generate bird plot charts.")

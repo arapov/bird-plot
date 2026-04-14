@@ -11,7 +11,6 @@ from matplotlib.patches import Circle
 from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_labels, add_quadrants, setup_plot
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def calculate_angles(categories: List[str], values: List[float]) -> Tuple[np.ndarray, np.ndarray]:
