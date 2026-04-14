@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 from pathlib import Path
@@ -8,6 +9,8 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 from matplotlib.patches import Rectangle
+
+logger = logging.getLogger(__name__)
 
 
 def setup_plot(config: dict) -> Tuple[Figure, Axes]:
@@ -65,8 +68,7 @@ def _add_bird_image(ax, img_path, x, y) -> None:
         # Add the annotation box containing the image to the plot
         ax.add_artist(ab)
     else:
-        # Print a warning if the image file cannot be found
-        print(f"Warning: Image not found at {img_path}")
+        logger.warning("Image not found at %s", img_path)
 
 
 def add_bird_images(ax: Axes, config: Dict) -> None:

@@ -10,13 +10,14 @@ from matplotlib.patches import FancyBboxPatch
 from .base import add_axis_labels, add_bird_images, add_date, add_quadrant_labels, add_quadrants, setup_plot
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def add_name_boxes(ax: Axes, df: pd.DataFrame) -> None:
     """Add names in rounded boxes to the plot."""
     for _, row in df.iterrows():
-        text = f"{row['Name']} {row['Note']}"
+        note = row.get("Note", "")
+        note_str = "" if (not note or pd.isna(note)) else str(note)
+        text = f"{row['Name']} {note_str}".strip()
         text_length = len(text)
         box_width = max(8, text_length * 0.4)
         box_height = 1
